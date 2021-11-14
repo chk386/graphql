@@ -1,0 +1,62 @@
+schema {
+    query: Query
+    mutation: Mutation
+}
+
+# READ
+type Query {
+    findMemberById(id: Int): Member
+    findMembers: [Member]
+}
+
+# CREATE, UPDATE, DELETE
+type Mutation {
+    createMember(name: String, company: Company): Member
+}
+
+type Member {
+    id: ID!
+    name: String!
+    # type, input 의 혼용은 불가능 함 : 2개의 값이 정확히 동일해도 각각 정의 내려야 함.
+    company(company: Company = COMMERCE): Company
+    teams: [Team!]!
+    createdAt: DateTime!
+}
+
+enum Company {
+    COMMERCE
+    ACCOMMATE
+    WETOO
+}
+
+type Team {
+    no: ID!
+    name: String!
+    createdAt: DateTime!
+}
+
+scalar DateTime
+
+# 추가..
+interface Server {
+    id: ID!
+    ip: String!
+}
+
+type CloudServer implements Server {
+    id: ID!
+    ip: String!
+}
+
+type PhysicalServer implements Server {
+    id: ID!
+    ip: String!
+    pricePerSec: Int!
+}
+
+
+
+
+
+
+

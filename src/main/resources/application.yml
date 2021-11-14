@@ -1,0 +1,27 @@
+server:
+  port: 8080
+
+dgs:
+  graphql:
+    path: /graphql
+    schema-json:
+      path: /schema.json
+      enabled: true
+    schema-locations:
+      - classpath*:schema/**/*.graphql*
+      - classpath*:graphql-experimental-schemas/**/*.graphql*
+    graphiql:
+      enabled: true
+      path: /graphiql
+    extensions:
+      scalars:
+        enabled: true
+        numbers:
+          enabled: true
+        objects:
+          enabled: true
+        chars:
+          enabled: true
+        time-dates:
+          enabled: true
+
