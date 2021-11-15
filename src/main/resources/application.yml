@@ -25,3 +25,7 @@ dgs:
         time-dates:
           enabled: true
 
+
+logging:
+  level:
+    com.nhncommerce: debug
