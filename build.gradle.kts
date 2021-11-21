@@ -19,10 +19,11 @@ repositories {
 
 dependencies {
 	// spring boot
-	implementation("org.springframework.boot:spring-boot-starter-webflux")
+//	implementation("org.springframework.boot:spring-boot-starter-webflux")
 
 	// kotlin
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
@@ -30,8 +31,11 @@ dependencies {
 
 	// graphql
 	implementation(platform("com.netflix.graphql.dgs:graphql-dgs-platform-dependencies:latest.release"))
-	implementation("com.netflix.graphql.dgs:graphql-dgs-spring-boot-starter")
+//	implementation("com.netflix.graphql.dgs:graphql-dgs-spring-boot-starter")
 	implementation("com.netflix.graphql.dgs:graphql-dgs-extended-scalars")
+
+	implementation("com.netflix.graphql.dgs:graphql-dgs-reactive")
+	implementation("com.netflix.graphql.dgs:graphql-dgs-webflux-starter")
 
 	// db
 	implementation("org.springframework.boot:spring-boot-starter-data-jdbc")

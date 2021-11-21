@@ -1,30 +1,28 @@
 package com.nhncommerce.graphql
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.netflix.graphql.dgs.*
+import com.netflix.graphql.dgs.context.DgsContext
+import com.netflix.graphql.dgs.reactive.DgsReactiveCustomContextBuilderWithRequest
 import com.nhncommerce.graphql.DgsConstants.MEMBER
 import com.nhncommerce.graphql.DgsConstants.MEMBER.Teams
-import com.nhncommerce.graphql.DgsConstants.QUERY
 import com.nhncommerce.graphql.DgsConstants.QUERY.FindMembers
 import com.nhncommerce.graphql.DgsConstants.QUERY_TYPE
-import com.nhncommerce.graphql.client.FindMemberByIdProjectionRoot
 import com.nhncommerce.graphql.types.Company
 import com.nhncommerce.graphql.types.Member
 import com.nhncommerce.graphql.types.Team
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-import org.springframework.context.annotation.Bean
-import org.springframework.web.reactive.function.server.RouterFunctions
+import org.springframework.http.HttpHeaders
+import org.springframework.web.reactive.config.EnableWebFlux
+import org.springframework.web.reactive.function.server.ServerRequest
 import reactor.core.publisher.Mono
 import java.time.OffsetDateTime
-import java.util.function.Consumer
+
 
 @SpringBootApplication
 class GraphqlApplication
-
 
 fun main(args: Array<String>) {
     runApplication<GraphqlApplication>(*args)
@@ -35,45 +33,83 @@ class MembersDataFetcher {
 
     val log: Logger = LoggerFactory.getLogger(this.javaClass)
 
+    /**
+     * @RequestHeader headerValue: String?
+     * @RequestParam(defaultValue = "key") param: String?
+     * @CookieValue(defaultValue = "defaultvalue") cookieValue: String?
+     */
     @DgsQuery
-    fun fetchOne(@InputArgument id: Int?): Member {
-        val member = Member(id.toString(), "this is graphQL", Company.COMMERCE, listOf(), OffsetDateTime.now())
+    fun findMemberById(@InputArgument id: Int? = 0): Mono<Member> {
+        val member = Member(id.toString(),
+            "this is graphQL",
+            Company.COMMERCE,
+            listOf(Team(id.toString(), "backoffice", OffsetDateTime.now())),
+            OffsetDateTime.now())
 
-        log.debug(member.toString())
-
-        return member
+        return Mono.just(member)
     }
 
     @DgsData(parentType = QUERY_TYPE, field = FindMembers)
-    fun fetchAll(): List<Member> {
-        return listOf(Member("1", "graphQL", Company.COMMERCE, listOf(), OffsetDateTime.now()),
-            Member("2", "restful", Company.ACCOMMATE, listOf(), OffsetDateTime.now()),
-            Member("3", "websocket", Company.WETOO, listOf(), OffsetDateTime.now()))
-    }
+    fun fetchAll(dfe: DgsDataFetchingEnvironment): Mono<List<Member>> {
+        val createdAt = OffsetDateTime.now()
 
+        val context = dfe.getDgsContext().customContext as MyContext
+
+        DgsContext.getCustomContext<MyContext>(dfe)
+            .apply { data = "fetchAll에서 보냅니다.~~~" }
+
+        return Mono.just(listOf(
+            Member("1", "graphQL", Company.COMMERCE, emptyList(), createdAt),
+            Member("2", "restful", Company.ACCOMMATE, emptyList(), createdAt),
+            Member("3", "websocket", Company.WETOO, emptyList(), createdAt)
+        ))
+    }
+//
+    // Child Datafetchers
     @DgsData(parentType = MEMBER.TYPE_NAME, field = Teams)
-    fun findMembers(dfe: DgsDataFetchingEnvironment): List<Team> {
+    fun findTeamsByMemberId(dfe: DgsDataFetchingEnvironment): Mono<List<Team>> {
         val member = dfe.getSource<Member>()
 
-        log.debug(member.id)
+        DgsContext.getCustomContext<MyContext>(dfe)
+            .also { println(it.data) }
 
-        return listOf(
-            Team("1", "backoffice", OffsetDateTime.now()),
-            Team("2", "BE", OffsetDateTime.now()),
-            Team("3", "FE", OffsetDateTime.now())
-        )
+        return Mono.just(listOf(
+            Team(member.id, "backoffice", OffsetDateTime.now()),
+            Team(member.id, "BE", OffsetDateTime.now()),
+            Team(member.id, "FE", OffsetDateTime.now())
+        ))
     }
 
-    @DgsData.List(
-        DgsData(parentType = QUERY_TYPE, field = FindMembers),
-        DgsData(parentType = QUERY_TYPE, field = FindMembers)
-    )
-    fun aa() {
-
+    /**
+     * <p>data fetcher context</p>
+     * <p>The context is initialized per request, before query execution starts.</p>
+     *
+     * fetchAll()에서 dgsContext에 값을 넣고 -> findTeamsByMemberId에서 꺼내올수 있다.
+     * request정보를 context에 넣고 싶을 경우 DgsCustomContextBuilderWithRequest를 구현하라.
+     */
+    @DgsComponent
+    class MyContextBuilder : DgsReactiveCustomContextBuilderWithRequest<MyContext> {
+        override fun build(
+            extensions: Map<String, Any>?,
+            headers: HttpHeaders?,
+            serverRequest: ServerRequest?
+        ) = Mono.just(MyContext("Hello"))
     }
+
+    data class MyContext(val customState: String, var data: String = "context")
+
+//    @DgsData.List(
+//        DgsData(parentType = QUERY_TYPE, field = FindMembers),
+//        DgsData(parentType = QUERY_TYPE, field = FindMembers)
+//    )
+//    fun aa() {
+//
+//    }
 
 //	@DgsSubscription
 //	fun createMember() {
 //
 //	}
+
 }
+

@@ -6,13 +6,12 @@ dgs:
     path: /graphql
     schema-json:
       path: /schema.json
-      enabled: true
     schema-locations:
       - classpath*:schema/**/*.graphql*
       - classpath*:graphql-experimental-schemas/**/*.graphql*
-    graphiql:
-      enabled: true
-      path: /graphiql
+#    graphiql:
+#      enabled: true
+#      path: /graphiql
     extensions:
       scalars:
         enabled: true
@@ -29,3 +28,5 @@ dgs:
 logging:
   level:
     com.nhncommerce: debug
+    org.springframework: info
+    com.netflix.graphql.dgs: info

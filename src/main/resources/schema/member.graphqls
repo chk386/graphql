@@ -30,7 +30,13 @@ enum Company {
 }
 
 type Team {
+    """
+    팀번호
+    """
     no: ID!
+    """
+    팀명
+    """
     name: String!
     createdAt: DateTime!
 }
