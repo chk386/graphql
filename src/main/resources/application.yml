@@ -9,9 +9,8 @@ dgs:
     schema-locations:
       - classpath*:schema/**/*.graphql*
       - classpath*:graphql-experimental-schemas/**/*.graphql*
-#    graphiql:
-#      enabled: true
-#      path: /graphiql
+    graphiql:
+      path: /graphiql
     extensions:
       scalars:
         enabled: true
@@ -23,7 +22,6 @@ dgs:
           enabled: true
         time-dates:
           enabled: true
-
 
 logging:
   level:
