@@ -96,7 +96,7 @@ class MembersDataFetcher {
         ) = Mono.just(MyContext("Hello"))
     }
 
-    data class MyContext(val customState: String, var data: String = "context")
+    data class MyContext(val customState: String, var data: String = "MyContext Data!!")
 
 //    @DgsData.List(
 //        DgsData(parentType = QUERY_TYPE, field = FindMembers),
