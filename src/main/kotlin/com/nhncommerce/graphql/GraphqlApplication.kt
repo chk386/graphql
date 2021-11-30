@@ -10,12 +10,12 @@ import com.nhncommerce.graphql.DgsConstants.QUERY_TYPE
 import com.nhncommerce.graphql.types.Company
 import com.nhncommerce.graphql.types.Member
 import com.nhncommerce.graphql.types.Team
+import com.nhncommerce.graphql.types.TeamInput
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.http.HttpHeaders
-import org.springframework.web.reactive.config.EnableWebFlux
 import org.springframework.web.reactive.function.server.ServerRequest
 import reactor.core.publisher.Mono
 import java.time.OffsetDateTime
@@ -98,18 +98,14 @@ class MembersDataFetcher {
 
     data class MyContext(val customState: String, var data: String = "MyContext Data!!")
 
-//    @DgsData.List(
-//        DgsData(parentType = QUERY_TYPE, field = FindMembers),
-//        DgsData(parentType = QUERY_TYPE, field = FindMembers)
-//    )
-//    fun aa() {
-//
-//    }
+    @DgsMutation
+    fun createMember(dfe: DgsDataFetchingEnvironment): Mono<Member> {
+        val a = dfe.getArgument<String>("name")
+        val c = dfe.getArgument<TeamInput>("teams")
+dfe.arguments
 
-//	@DgsSubscription
-//	fun createMember() {
-//
-//	}
+        log.debug(dfe.toString())
 
+        return Mono.just(Member("1", "nhn", Company.COMMERCE, emptyList(), OffsetDateTime.now()))
+    }
 }
-

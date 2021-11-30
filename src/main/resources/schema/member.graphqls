@@ -11,7 +11,7 @@ type Query {
 
 # CREATE, UPDATE, DELETE
 type Mutation {
-    createMember(name: String, company: Company): Member
+    createMember(name: String!, company: Company!, teams: [TeamInput]!): Member
 }
 
 type Member {
@@ -21,6 +21,10 @@ type Member {
     company(company: Company = COMMERCE): Company
     teams: [Team!]!
     createdAt: DateTime!
+}
+
+input TeamInput {
+    name: String!
 }
 
 enum Company {
