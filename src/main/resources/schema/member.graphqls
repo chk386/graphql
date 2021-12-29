@@ -6,16 +6,16 @@ schema {
 # READ
 type Query {
     findMemberById(id: Int): Member
-    findMembers: [Member]
+    findMembers: [Member] # [] : array
 }
 
 type Member {
-    id: ID!
+    id: ID! # ! : non-nullable
     name: String!
-    # type, input 의 혼용은 불가능 함 : 2개의 값이 정확히 동일해도 각각 정의 내려야 함.
-    company(company: Company = COMMERCE): Company
+    company(company: Company = COMMERCE): Company # default value
     teams: [Team!]!
     createdAt: DateTime!
+    phone: String @deprecated(reason: "쿼리가 변경되었어요. realPhone으로 변경했어요.")
 }
 
 enum Company {
@@ -50,7 +50,16 @@ input TeamInput {
     name: String
 }
 
+type Subscription {
+    push: PushMessage
+}
 
+type PushMessage {
+    title(title:String = "기본 타이틀"): String!
+    content: String
+}
+
+# custom scalar type, DateTime은 dgs에서 자바타입 변환을 위해 미리 선언됨
 scalar DateTime
 
 # 추가..
@@ -69,6 +78,8 @@ type PhysicalServer implements Server {
     ip: String!
     pricePerSec: Int!
 }
+
+union AllServer = CloudServer | PhysicalServer
 
 
 

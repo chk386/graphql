@@ -22,6 +22,8 @@ dgs:
           enabled: true
         time-dates:
           enabled: true
+    introspection:
+      enabled: true
 
 logging:
   level:
