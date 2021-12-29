@@ -9,11 +9,6 @@ type Query {
     findMembers: [Member]
 }
 
-# CREATE, UPDATE, DELETE
-type Mutation {
-    createMember(name: String!, company: Company!, teams: [TeamInput]!): Member
-}
-
 type Member {
     id: ID!
     name: String!
@@ -21,10 +16,6 @@ type Member {
     company(company: Company = COMMERCE): Company
     teams: [Team!]!
     createdAt: DateTime!
-}
-
-input TeamInput {
-    name: String!
 }
 
 enum Company {
@@ -44,6 +35,21 @@ type Team {
     name: String!
     createdAt: DateTime!
 }
+
+# CREATE, UPDATE, DELETE
+type Mutation {
+    createMember(name: String, memberInput: MemberInput): Member
+}
+
+input MemberInput {
+    company: Company
+    teamInput: [TeamInput!]!
+}
+
+input TeamInput {
+    name: String
+}
+
 
 scalar DateTime
 

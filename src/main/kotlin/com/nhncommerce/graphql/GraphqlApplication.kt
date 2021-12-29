@@ -1,24 +1,28 @@
 package com.nhncommerce.graphql
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.netflix.graphql.dgs.*
 import com.netflix.graphql.dgs.context.DgsContext
 import com.netflix.graphql.dgs.reactive.DgsReactiveCustomContextBuilderWithRequest
+import com.netflix.graphql.dgs.reactive.internal.DgsReactiveRequestData
 import com.nhncommerce.graphql.DgsConstants.MEMBER
 import com.nhncommerce.graphql.DgsConstants.MEMBER.Teams
 import com.nhncommerce.graphql.DgsConstants.QUERY.FindMembers
 import com.nhncommerce.graphql.DgsConstants.QUERY_TYPE
 import com.nhncommerce.graphql.types.Company
 import com.nhncommerce.graphql.types.Member
+import com.nhncommerce.graphql.types.MemberInput
 import com.nhncommerce.graphql.types.Team
-import com.nhncommerce.graphql.types.TeamInput
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.http.HttpHeaders
+import org.springframework.web.reactive.config.EnableWebFlux
 import org.springframework.web.reactive.function.server.ServerRequest
 import reactor.core.publisher.Mono
 import java.time.OffsetDateTime
+import java.util.HashMap
 
 
 @SpringBootApplication
@@ -32,7 +36,6 @@ fun main(args: Array<String>) {
 class MembersDataFetcher {
 
     val log: Logger = LoggerFactory.getLogger(this.javaClass)
-
     /**
      * @RequestHeader headerValue: String?
      * @RequestParam(defaultValue = "key") param: String?
@@ -52,7 +55,6 @@ class MembersDataFetcher {
     @DgsData(parentType = QUERY_TYPE, field = FindMembers)
     fun fetchAll(dfe: DgsDataFetchingEnvironment): Mono<List<Member>> {
         val createdAt = OffsetDateTime.now()
-
         val context = dfe.getDgsContext().customContext as MyContext
 
         DgsContext.getCustomContext<MyContext>(dfe)
@@ -80,6 +82,16 @@ class MembersDataFetcher {
         ))
     }
 
+    @DgsMutation
+    fun createMember(@InputArgument("memberInput") memberInput: MemberInput,  dfe: DgsDataFetchingEnvironment): Mono<Member> {
+        val name = dfe.getArgument<String>("name");
+
+        log.debug("inputArgument : $memberInput")
+        log.debug("name : $name")
+
+        return Mono.just(Member("100000", "created", Company.COMMERCE, emptyList(), OffsetDateTime.now()))
+    }
+
     /**
      * <p>data fetcher context</p>
      * <p>The context is initialized per request, before query execution starts.</p>
@@ -97,15 +109,4 @@ class MembersDataFetcher {
     }
 
     data class MyContext(val customState: String, var data: String = "MyContext Data!!")
-
-    @DgsMutation
-    fun createMember(dfe: DgsDataFetchingEnvironment): Mono<Member> {
-        val a = dfe.getArgument<String>("name")
-        val c = dfe.getArgument<TeamInput>("teams")
-dfe.arguments
-
-        log.debug(dfe.toString())
-
-        return Mono.just(Member("1", "nhn", Company.COMMERCE, emptyList(), OffsetDateTime.now()))
-    }
 }
